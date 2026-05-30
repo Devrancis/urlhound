@@ -1,6 +1,4 @@
 <div align="center">
-  <!-- <img src="static/images/branding/banner.png" alt="URLHound Banner" width="100%"> -->
-
   # URLHOUND
   ### AI-Powered Phishing URL Detection Engine
 
