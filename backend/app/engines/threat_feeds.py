@@ -14,15 +14,12 @@ class ThreatFeedEngine:
         Excellent for catching malware distribution URLs.
         """
         try:
-            # We set a strict 5-second timeout. We never want a dead third-party API 
-            # to cause our own API to hang indefinitely.
             response = await client.post(self.urlhaus_api, data={"url": url}, timeout=5.0)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("query_status") == "ok":
                     return {"source": "URLhaus", "malicious": True, "details": data.get("threat", "Malware URL")}
         except httpx.RequestError:
-            # If the network request fails, we silently pass and assume safe (fail open).
             pass 
         return {"source": "URLhaus", "malicious": False}
 
