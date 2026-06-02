@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: echelon_api_gateway
+    # WHY: Maps the host's port 8000 to the container's port 8000.
+    ports:
+      - "8000:8000"
+    # WHY: Injects the configuration variables (like the OpenAI and Google keys) directly into the container.
+    env_file:
+      - ./backend/.env
+    # WHY: Ensures the backend automatically restarts if it crashes or if the host server reboots.
+    restart: unless-stopped
+    networks:
+      - echelon_matrix
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: echelon_ui_dashboard
+    # WHY: Maps the host's port 3000 to Nginx's internal port 80.
+    ports:
+      - "3000:80"
+    # WHY: Tells Docker to wait and start the backend container before attempting to start the frontend.
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - echelon_matrix
+
+# WHY: We define a custom bridge network so these containers can resolve each other by name internally.
+networks:
+  echelon_matrix:
+    driver: bridge
