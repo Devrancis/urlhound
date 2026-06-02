@@ -2,6 +2,7 @@ import httpx
 import asyncio
 import os
 from app.models.schemas import EngineResult
+from app.core.config import settings
 
 class ThreatFeedEngine:
     def __init__(self):
