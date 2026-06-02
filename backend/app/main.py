@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.schemas import AnalyzeRequest, AnalyzeResponse
 from app.services.analyzer import EchelonAnalyzerService
+from app.core.config import settings
 
 # Initialize the FastAPI application
 app = FastAPI(
@@ -20,10 +21,10 @@ ALLOWED_ORIGINS = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],  # Permits all standard verbs (GET, POST, OPTIONS, etc.)
-    allow_headers=["*"],  # Permits all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Instantiate the analyzer service globally to avoid reloading overhead per request
