@@ -5,12 +5,7 @@ from typing import List, Optional, Dict, Any
 # INPUT SCHEMA
 
 class AnalyzeRequest(BaseModel):
-    # We use a raw string instead of Pydantic's strict `HttpUrl` type here.
-    # WHY: Users often paste defanged or incomplete URLs (e.g., "example[.]com" or "google.com" without "https://").
-    # If we strictly enforce HttpUrl at the API gateway, the request will fail before we can analyze it.
-    # We will handle sanitization and scheme normalization inside our engines.
     url: str = Field(..., description="The raw URL string submitted for analysis")
-
 
 # COMPONENT SCHEMAS
 

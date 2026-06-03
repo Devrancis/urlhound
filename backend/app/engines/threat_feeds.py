@@ -45,7 +45,6 @@ class ThreatFeedEngine:
         try:
             response = await client.post(api_url, json=payload, timeout=5.0)
             if response.status_code == 200 and response.json():
-                # If Google returns an empty JSON {}, it's safe. If it returns data, it found a match.
                 return {"source": "SafeBrowsing", "malicious": True, "details": "Flagged by Google Safe Browsing"}
         except httpx.RequestError:
             pass
@@ -58,19 +57,15 @@ class ThreatFeedEngine:
 
         # Open a single connection pool for all outgoing requests
         async with httpx.AsyncClient() as client:
-            # Execute all threat feed checks concurrently
             results = await asyncio.gather(
                 self._check_urlhaus(client, url),
                 self._check_safebrowsing(client, url)
             )
 
-        # Parse the aggregated results
         for res in results:
             raw_responses[res["source"]] = res
             if res.get("malicious"):
                 findings.append(f"Flagged by {res['source']}: {res.get('details')}")
-                # A direct hit on a threat intelligence feed is highly deterministic.
-                # We automatically spike the score to 100 for this specific engine.
                 risk_score = 100 
 
         return EngineResult(
@@ -79,11 +74,9 @@ class ThreatFeedEngine:
             raw_data=raw_responses
         )
 
-# Simple execution block for local testing
 if __name__ == "__main__":
     async def run_test():
         engine = ThreatFeedEngine()
-        # You can test a known bad URL or a safe one
         test_url = "http://example.com" 
         result = await engine.analyze(test_url)
         print(result.model_dump_json(indent=2))
