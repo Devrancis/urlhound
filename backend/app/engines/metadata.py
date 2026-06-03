@@ -18,14 +18,10 @@ class MetadataEngine:
         risk_score = 0
         raw_metadata = {}
 
-        # 1. Isolate the root domain
-        # WHY: WHOIS lookups fail if you pass subdomains or paths (e.g., secure.paypal.com/login).
-        # We must query the base domain (e.g., paypal.com).
+        # Isolate the root domain
         extracted = tldextract.extract(url)
         root_domain = f"{extracted.domain}.{extracted.suffix}"
 
-        # If it's a raw IP address or invalid domain, WHOIS isn't applicable here.
-        # (Our heuristic engine already flags raw IPs).
         if not extracted.domain or not extracted.suffix:
             return EngineResult(risk_score=0, findings=["Skipped WHOIS: Invalid or raw IP domain"])
 
@@ -36,7 +32,6 @@ class MetadataEngine:
             
             creation_date = domain_info.creation_date
             
-            # WHOIS servers are notoriously inconsistent. creation_date can be a single datetime, 
             # a list of datetimes, a string, or completely missing.
             if isinstance(creation_date, list):
                 creation_date = creation_date[0]
@@ -57,16 +52,11 @@ class MetadataEngine:
                 findings.append("WHOIS creation date is missing or malformed (often a sign of a hidden/suspicious registrar).")
                 risk_score += 15
 
-            # Registrar check (Optional enhancement: flag known bulk/cheap registrars)
             registrar = domain_info.registrar
             if registrar and any(cheap_reg in str(registrar).lower() for cheap_reg in ['namecheap', 'godaddy', 'hostinger']):
-                # We don't score this highly because legitimate sites use them too, 
-                # but it adds context for the AI explanation layer.
                 findings.append(f"Domain registered via budget/bulk registrar: {registrar}")
                 
         except Exception as e:
-            # WHOIS lookups can fail due to rate limiting, network issues, or blocked TLDs.
-            # We fail open so the overall system doesn't crash.
             findings.append(f"WHOIS lookup failed or timed out: {str(e)}")
             return EngineResult(risk_score=0, findings=findings, raw_data={"error": str(e)})
 
@@ -76,10 +66,8 @@ class MetadataEngine:
             raw_data=raw_metadata
         )
 
-# Simple execution block for local testing
 if __name__ == "__main__":
     engine = MetadataEngine()
-    # Test with a known old domain to see the "established" finding
     test_url = "https://www.github.com" 
     result = engine.analyze(test_url)
     print(result.model_dump_json(indent=2))
