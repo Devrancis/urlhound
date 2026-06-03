@@ -1,13 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 
-
-# INPUT SCHEMA
-
 class AnalyzeRequest(BaseModel):
     url: str = Field(..., description="The raw URL string submitted for analysis")
 
-# COMPONENT SCHEMAS
 
 class EngineResult(BaseModel):
     """
@@ -20,8 +16,6 @@ class EngineResult(BaseModel):
     findings: List[str] = Field(default_factory=list, description="Specific triggers found (e.g., 'Suspicious TLD')")
     raw_data: Optional[Dict[str, Any]] = Field(default=None, description="Raw JSON from third-party APIs for debugging")
 
-# OUTPUT SCHEMA
-
 class AnalyzeResponse(BaseModel):
     url: str
     overall_risk_score: int = Field(..., ge=0, le=100)
@@ -32,5 +26,4 @@ class AnalyzeResponse(BaseModel):
     threat_feeds: EngineResult
     domain_metadata: EngineResult
     
-    # AI Layer
     ai_explanation: Optional[str] = Field(None, description="Plain-English explanation of the verdict")
