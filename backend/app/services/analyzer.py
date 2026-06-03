@@ -4,15 +4,15 @@ from app.models.schemas import AnalyzeResponse, EngineResult
 from app.engines.heuristics import HeuristicEngine
 from app.engines.threat_feeds import ThreatFeedEngine
 from app.engines.metadata import MetadataEngine
-from app.services.ai_service import AIService  # [!] NEW: Import the AI Service
+from app.services.ai_service import AIService
 
 class EchelonAnalyzerService:
     def __init__(self):
-        # Initialize our detection modules
+        # Initialize detection modules
         self.heuristics = HeuristicEngine()
         self.threat_feeds = ThreatFeedEngine()
         self.metadata = MetadataEngine()
-        self.ai = AIService()  # [!] NEW: Instantiate the AI Service
+        self.ai = AIService() 
 
     def _calculate_severity(self, score: int) -> str:
         """Categorize the numerical score into an actionable severity level."""
@@ -24,15 +24,15 @@ class EchelonAnalyzerService:
             return "Dangerous"
 
     async def analyze_url(self, url: str) -> AnalyzeResponse:
-        # 1. Execute engines
+        # Execute engines
         heuristics_res = self.heuristics.analyze(url)
         metadata_res = self.metadata.analyze(url)
         threat_res = await self.threat_feeds.analyze(url)
 
-        # 2. Compile findings
+        # Compile findings
         all_findings = heuristics_res.findings + metadata_res.findings + threat_res.findings
 
-        # 3. Calculate Final Weighted Score
+        # Calculate Final Weighted Score
         weighted_score = (
             (threat_res.risk_score * 0.50) + 
             (heuristics_res.risk_score * 0.30) + 
@@ -49,8 +49,7 @@ class EchelonAnalyzerService:
         final_score = min(final_score, 100)
         severity = self._calculate_severity(final_score)
 
-        # 4. Generate AI Explanation
-        # [!] NEW: We now await the actual LLM call instead of a local static function
+        # Generate AI Explanation
         ai_text = await self.ai.generate_explanation(
             url=url, 
             severity=severity, 
@@ -58,7 +57,7 @@ class EchelonAnalyzerService:
             findings=all_findings
         )
 
-        # 5. Return the strictly validated Pydantic model
+        # Return the strictly validated Pydantic model
         return AnalyzeResponse(
             url=url,
             overall_risk_score=final_score,
