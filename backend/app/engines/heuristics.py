@@ -57,7 +57,6 @@ class HeuristicEngine:
             }
         )
 
-# Simple execution block for local testing
 if __name__ == "__main__":
     engine = HeuristicEngine()
     test_url = "http://secure-update.paypal.com.hacker-server.xyz/login-verify"
