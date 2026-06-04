@@ -6,9 +6,7 @@ import {
   Terminal, Wifi, Eye, Activity,
 } from 'lucide-react';
 
-/* ─────────────────────────────────────────────────────────────
-   FONT + GLOBAL STYLES INJECTION
-───────────────────────────────────────────────────────────── */
+/* FONT + GLOBAL STYLES INJECTION*/
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
@@ -479,9 +477,6 @@ export default function App() {
                 FEEDS ONLINE
               </span>
             </div>
-            <span style={{ fontSize: '10px', color: '#1e3a5c', letterSpacing: '0.1em' }}>
-              v1.0.0
-            </span>
           </div>
         </header>
 
@@ -519,7 +514,7 @@ export default function App() {
               fontSize: '13px', color: '#3a5470',
               maxWidth: '400px', margin: '0 auto', lineHeight: 1.75,
             }}>
-              Heuristic analysis, domain telemetry & live threat intelligence feeds — combined into a single risk verdict.
+              Heuristic analysis, domain telemetry & live threat intelligence feeds combined into a single risk verdict.
             </p>
           </section>
 
