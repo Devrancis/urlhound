@@ -3,10 +3,6 @@ from openai import AsyncOpenAI
 from typing import List
 
 class AIService:
-    """
-    Echelon Architecture: Intelligence Synthesis Module.
-    Translates raw heuristic and telemetry findings into actionable intelligence.
-    """
     def __init__(self):
         self.api_key = os.getenv("OPENAI_API_KEY")
         
@@ -22,7 +18,6 @@ class AIService:
         if not self.client:
             return self._generate_local_fallback(url, severity, findings)
 
-        # Construct the system prompt to enforce a strict security analyst persona
         system_prompt = (
             "You are a senior cybersecurity analyst. Your job is to explain to a user why a specific URL "
             "was flagged by automated threat detection engines. Keep your explanation under 3 sentences. "
@@ -38,7 +33,6 @@ class AIService:
         )
 
         try:
-            # We enforce a strict timeout. Never let a third-party LLM hang your API response.
             response = await self.client.chat.completions.create(
                 model="gpt-4o-mini", # Fast, cheap, and highly capable for summarization
                 messages=[
@@ -46,13 +40,12 @@ class AIService:
                     {"role": "user", "content": user_prompt}
                 ],
                 max_tokens=150,
-                temperature=0.3, # Low temperature for factual, deterministic outputs
+                temperature=0.3,
                 timeout=5.0 
             )
             return response.choices[0].message.content.strip()
 
         except Exception as e:
-            # Log the error in production, but fail open for the user
             print(f"[!] AI Generation Failed: {str(e)}")
             return self._generate_local_fallback(url, severity, findings)
 
@@ -70,7 +63,6 @@ class AIService:
             return explanation + "Recommendation: Proceed with extreme caution."
         return explanation + "Recommendation: No significant threats found, but always verify the sender."
 
-# Local testing block
 if __name__ == "__main__":
     import asyncio
     async def run_test():
